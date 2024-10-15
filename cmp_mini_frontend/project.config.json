@@ -1,0 +1,9 @@
+{
+	"setting": {
+		"packNpmManually": true,
+		"packNpmRelationList": [{
+			"packageJsonPath": "./package.json",
+			"miniprogramNpmDistDir": "./dist/dev/mp-weixin"
+		}]
+	}
+}
