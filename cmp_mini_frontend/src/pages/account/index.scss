@@ -1,0 +1,11 @@
+.accountPage{
+    height: 100%;
+    width: 100%;
+    .top{
+        background: linear-gradient(90deg,#FFF8DC 0%,#FFF8DD 50%,#FFF6D9 70%,#FFE8C7 100%);
+        height: 400px;
+        .avatar{
+            height: 100%;
+        }
+    }
+}
