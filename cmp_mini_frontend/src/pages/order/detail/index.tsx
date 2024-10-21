@@ -13,6 +13,7 @@ import { ArrowDown, ArrowRight } from "@nutui/icons-react-taro";
 import { useSelector } from "react-redux";
 import SettleCard from "@/components/SettleCard/index";
 import customTheme from "./customTheme";
+import { title } from "@/constants";
 
 export default function Detail() {
   const { params } = useRouter();
@@ -46,7 +47,7 @@ export default function Detail() {
           <View className="middle">
             <Cell.Group>
               <Cell
-                title="清白江xxx食品店"
+                title={title}
                 extra={
                   <ArrowRight
                     onClick={() =>

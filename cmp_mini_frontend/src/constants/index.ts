@@ -1,1 +1,1 @@
-export const title = "青白江xxx副食店";
+export const title = "青白江江建老总总批发门市";

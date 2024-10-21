@@ -13,6 +13,7 @@ import "./index.scss";
 import { userLogin } from "@/store/user";
 import theme from "./customTheme";
 import { getTopSafeArea, getMenuSafeArea } from "@/utils/systemInfo";
+import { title } from "@/constants";
 export default function Login() {
   const menuHeight = getMenuSafeArea();
   const currentUser = useSelector((state: any) => state.user.loginUser);
@@ -38,7 +39,7 @@ export default function Login() {
         className="loginPage"
       >
         <Col span={24}>
-          <Text className="title">青白江xxx副食店</Text>
+          <Text className="title">{title}</Text>
           <Form
             labelPosition="right"
             footer={
