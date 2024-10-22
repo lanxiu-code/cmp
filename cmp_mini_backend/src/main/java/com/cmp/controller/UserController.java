@@ -16,6 +16,7 @@ import com.cmp.model.dto.user.UserRegisterRequest;
 import com.cmp.model.dto.user.UserUpdateMyRequest;
 import com.cmp.model.dto.user.UserUpdateRequest;
 import com.cmp.model.entity.User;
+import com.cmp.model.vo.LoginInfo;
 import com.cmp.model.vo.LoginUserVO;
 import com.cmp.model.vo.UserVO;
 import com.cmp.service.UserService;
@@ -84,7 +85,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/login")
-    public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public BaseResponse<LoginInfo> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         if (userLoginRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -93,8 +94,11 @@ public class UserController {
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
-        return ResultUtils.success(loginUserVO);
+        String token = userService.userLogin(userAccount, userPassword, request);
+        LoginInfo loginInfo = LoginInfo.builder()
+                .token(token)
+                .build();
+        return ResultUtils.success(loginInfo);
     }
 
 

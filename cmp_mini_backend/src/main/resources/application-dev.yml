@@ -3,6 +3,8 @@
 # 
 server:
   port: 8101
+  servlet:
+    context-path: /dev-api
 spring:
   # 数据库配置
   # todo 需替换配置
