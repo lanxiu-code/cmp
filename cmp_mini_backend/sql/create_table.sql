@@ -132,6 +132,19 @@ create table if not exists address
     index idx_uid (uid)
 ) comment '地址' collate = utf8mb4_unicode_ci;
 
+-- 购物车表
+create table if not exists carts
+(
+    id           bigint auto_increment comment 'id' primary key,
+    uid          bigint                                 not null comment '用户id',
+    goodsId     bigint                                 not null comment '商品id',
+    quantity     int                                    not null comment '商品数量',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除',
+    index idx_uid (uid),
+    index idx_goodsId (goodsId)
+) comment '购物车' collate = utf8mb4_unicode_ci;
 
 
 

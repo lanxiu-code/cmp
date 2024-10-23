@@ -74,6 +74,7 @@ export default function Detail() {
             <Cell.Group divider={false} style={{ borderRadius: "100px" }}>
               <Cell title="下单时间" extra="2020-1-1 20:00" />
               <Cell title="订单编号" extra="234752937452347593" />
+              <Cell title="收货信息" extra="四川省成都市xx" />
               <Cell title="备注" extra="无" />
               <Cell title="门店" extra="清白江xxx副食店" />
             </Cell.Group>

@@ -119,6 +119,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Long getUid() {
         String tokenValue = StpUtil.getTokenValue();
+        if (tokenValue == null ) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
         String uid = (String) StpUtil.getLoginIdByToken(tokenValue);
         return Long.parseLong(uid);
     }
