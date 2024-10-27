@@ -1,13 +1,15 @@
-import { Cell, Col, Image, Price, Row, Space } from "@nutui/nutui-react-taro";
+import { Avatar, Cell, Col, Price, Row, Space } from "@nutui/nutui-react-taro";
 import "./index.scss";
-import { CustomWrapper, Text, View } from "@tarojs/components";
+import { Text, View } from "@tarojs/components";
 import OrderType from "@/enum/order";
 import Taro from "@tarojs/taro";
+import dayjs from "dayjs";
+import { OrdersVO } from "@/servers";
 interface Props {
-  data: any;
+  data: OrdersVO;
 }
 export default function OrderCard(props: Props) {
-  const itemRender = (data) => {
+  const itemRender = (data: OrdersVO) => {
     return (
       <View
         onClick={() =>
@@ -17,21 +19,31 @@ export default function OrderCard(props: Props) {
         }
       >
         <Cell.Group key={data?.id}>
-          <Cell title={data?.name} extra={OrderType[data.type]}></Cell>
+          <Cell
+            title={data?.orderNo}
+            extra={OrderType[data?.status as number]}
+          ></Cell>
           <Cell>
-            <Image radius={15} src={data?.img} height={80} width={80} />
+            <Avatar.Group size="large" max="3" level="right" maxContent="...">
+              {data?.goodsList?.length &&
+                data?.goodsList?.map((item) => (
+                  <Avatar src={item?.image} key={item?.id} />
+                ))}
+            </Avatar.Group>
           </Cell>
           <Cell>
             <Row type="flex" align="center" justify="space-between">
               <Col span={10}>
-                <Text>{data?.createTime}</Text>
+                <Text>{`${dayjs(data?.createTime).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                )}`}</Text>
               </Col>
               <Col span={14} className="flex-end">
                 <Space>
-                  <Text>{`共${data?.count}件`}</Text>
+                  <Text>{`共${data?.quantity}件`}</Text>
                   <Price
                     style={{ color: "#000" }}
-                    price={data?.total}
+                    price={data?.totalPrice}
                     size="normal"
                     thousands
                   />

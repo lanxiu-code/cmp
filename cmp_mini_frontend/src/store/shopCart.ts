@@ -1,41 +1,77 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
+import { GoodsVO } from "./../servers/models/GoodsVO";
+import { CartsControllerService, CartsEditRequest, CartsVO } from "@/servers";
+import { createSlice } from "@reduxjs/toolkit";
+import { current, pageSize } from "@/constants";
+import { ResponseCode } from "@/servers/core/request";
+import Taro from "@tarojs/taro";
+// 获取购物车列表
+export const getCartsList = () => {
+  return async (dispatch) => {
+    const res = await CartsControllerService.listMyCartsVoByPageUsingPost({
+      current,
+      pageSize,
+    });
+    dispatch(addShopCart(res?.data?.records));
+    return res;
+  };
+};
+// 添加购物车
+export const addCartsGoods = (goods: GoodsVO) => {
+  return async (dispatch) => {
+    const res = await CartsControllerService.addCartsUsingPost({
+      goodsId: goods.id,
+      quantity: goods.quantity,
+    });
+    if (res.code == ResponseCode.SUCCESS) {
+      // dispatch(addShopCart([buildCartsVO(res.data, goods)]));
+      // 更新购物车列表
+      const newCarts =
+        await CartsControllerService.listMyCartsVoByPageUsingPost({
+          current,
+          pageSize,
+        });
+      dispatch(addShopCart(newCarts?.data?.records));
+    } else {
+      Taro.showToast({
+        title: res.message,
+        icon: "none",
+      });
+    }
+    return res;
+  };
+};
+// 清空购物车
+export const clearCartsList = () => {
+  return async (dispatch) => {
+    const res = await CartsControllerService.clearCartsUsingPost();
+    dispatch(clearShopCart());
+    return res;
+  };
+};
+// 更新购物车
+export const updateCartsList = (data: CartsEditRequest) => {
+  return async (dispatch) => {
+    const res = await CartsControllerService.editCartsUsingPost(data);
+    await dispatch(getCartsList());
+    return res;
+  };
+};
+// 删除购物车某项
+export const deleteCarts = (id: number) => {
+  return async (dispatch) => {
+    const res = await CartsControllerService.deleteCartsUsingPost({ id });
+    await dispatch(getCartsList());
+    return res;
+  };
+};
 export const shopCartSlice = createSlice({
   name: "shopCart",
   initialState: {
-    shopCartList: [
-      {
-        id: 1,
-        name: "蜜桃四季春",
-        price: 10,
-        count: 100,
-        img: "//img10.360buyimg.com/n2/s240x240_jfs/t1/210890/22/4728/163829/6163a590Eb7c6f4b5/6390526d49791cb9.jpg!q70.jpg",
-      },
-      {
-        id: 2,
-        name: "蜜桃四季春",
-        price: 12.4,
-        count: 1,
-        img: "//img10.360buyimg.com/n2/s240x240_jfs/t1/210890/22/4728/163829/6163a590Eb7c6f4b5/6390526d49791cb9.jpg!q70.jpg",
-      },
-      {
-        id: 3,
-        name: "蜜桃四季春",
-        price: 1.5,
-        count: 8,
-        img: "//img10.360buyimg.com/n2/s240x240_jfs/t1/210890/22/4728/163829/6163a590Eb7c6f4b5/6390526d49791cb9.jpg!q70.jpg",
-      },
-    ],
+    shopCartList: [] as CartsVO[],
   },
   reducers: {
     addShopCart: (state, action) => {
-      state.shopCartList.push(action.payload);
-    },
-    removeShopCart: (state, action) => {
-      state.shopCartList.splice(action.payload, 1);
-    },
-    updateShopCart: (state, action) => {
-      state.shopCartList[action.payload.index].count = action.payload.count;
+      state.shopCartList = action.payload;
     },
     clearShopCart: (state) => {
       state.shopCartList = [];
@@ -43,7 +79,6 @@ export const shopCartSlice = createSlice({
   },
 });
 // 每个 case reducer 函数会生成对应的 Action creators
-export const { addShopCart, removeShopCart, updateShopCart, clearShopCart } =
-  shopCartSlice.actions;
+export const { addShopCart, clearShopCart } = shopCartSlice.actions;
 
 export default shopCartSlice.reducer;

@@ -1,23 +1,39 @@
+import { GoodsControllerService } from "@/servers";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
+import { current, pageSize } from "@/constants";
+export const getGoodsList = (categoryId) => {
+  return async (dispatch) => {
+    const res = await GoodsControllerService.listGoodsVoByPageUsingPost({
+      categoryId,
+      current,
+      pageSize,
+    });
+    // dispatch(setGoodsList(res?.data?.records));
+    dispatch(
+      setGoodsMap({
+        categoryId,
+        goodsList: res?.data?.records,
+      })
+    );
+    return res;
+  };
+};
 export const goodsSlice = createSlice({
   name: "goods",
   initialState: {
-    goodsList: [
-      {
-        id: 1,
-        name: "商品1",
-        price: 10,
-        count: 1,
-        img: "//img10.360buyimg.com/n2/s240x240_jfs/t1/210890/22/4728/163829/6163a590Eb7c6f4b5/6390526d49791cb9.jpg!q70.jpg",
-        desc: "商品描述1",
-        selected: false,
-      },
-    ],
+    goodsList: [],
+    goodsMap: {},
   },
-  reducers: {},
+  reducers: {
+    setGoodsList: (state, action) => {
+      state.goodsList = action.payload;
+    },
+    setGoodsMap: (state, action) => {
+      state.goodsMap[action.payload.categoryId] = action.payload.goodsList;
+    },
+  },
 });
 // 每个 case reducer 函数会生成对应的 Action creators
-// export const { setToken } = goodsSlice.actions;
+export const { setGoodsList, setGoodsMap } = goodsSlice.actions;
 
 export default goodsSlice.reducer;

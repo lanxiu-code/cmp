@@ -8,8 +8,10 @@ import {
 } from "@nutui/nutui-react-taro";
 import { useState } from "react";
 import { View } from "@tarojs/components";
+import Taro, { Events } from "@tarojs/taro";
 export default function Remark() {
   const [content, setContent] = useState<string>("");
+  const events = new Events();
   return (
     <ConfigProvider className="remark">
       <CustomBar customTitle="订单备注" showBack={true} />
@@ -23,9 +25,19 @@ export default function Remark() {
             maxLength={50}
             showCount={true}
             autoSize
-            onChange={(val) => setContent(val)}
+            onChange={(val) => {
+              setContent(val);
+            }}
           />
-          <Button size="xlarge" block type="primary">
+          <Button
+            onClick={() => {
+              events.trigger("setOrdersRemark", content);
+              Taro.navigateBack();
+            }}
+            size="xlarge"
+            block
+            type="primary"
+          >
             完成
           </Button>
         </Space>

@@ -3,6 +3,7 @@ export default defineAppConfig({
     "pages/user/login/index",
     "pages/shop/index",
     "pages/shop/pay/index",
+    "pages/shop/result/index",
     "pages/order/index",
     "pages/add/address/index",
     "pages/account/address/index",

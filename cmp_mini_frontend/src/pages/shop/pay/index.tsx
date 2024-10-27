@@ -2,26 +2,23 @@ import "./index.scss";
 import {
   Address,
   Cell,
-  Col,
   Collapse,
   ConfigProvider,
-  Image,
-  InputNumber,
-  Price,
-  Row,
-  Space,
 } from "@nutui/nutui-react-taro";
 import CustomBar from "@/components/CustomBar/index";
-import Category from "@/components/Category/index";
 import { Text, View } from "@tarojs/components";
 import { ArrowDown, ArrowRight } from "@nutui/icons-react-taro";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import customTheme from "./customTheme";
 import SettleBar from "@/components/SettleBar/index";
-import Taro from "@tarojs/taro";
+import Taro, { Events, useLoad } from "@tarojs/taro";
 import SettleCard from "@/components/SettleCard/index";
 import { useState } from "react";
 import { getAddress } from "@/utils/addressUtils";
+import { CartsVO, OrdersAddRequest } from "@/servers";
+import { buildAddressObjList } from "@/adapter/AddressAdapter";
+import { calcCartCount, calcCartPrice } from "@/utils/cartUtil";
+import { buildOrderGoodsAddList } from "@/adapter/OrdersAdapter";
 interface AddressList {
   id?: string | number;
   provinceName: string;
@@ -35,27 +32,42 @@ interface AddressList {
 }
 export default function Pay() {
   const [addressVisible, setAddressVisible] = useState(false);
+  const events = new Events();
   const shopCartList: [] = useSelector(
     (state: any) => state.shopCart.shopCartList
   );
   const addressList: [] = useSelector(
     (state: any) => state.address.addressList
   );
-
-  const [existList, setExistAddress] = useState(
-    JSON.parse(JSON.stringify(addressList))
-  );
-
+  const [existList, setExistAddress] = useState();
+  const [ordersInfo, setOrdersInfo] = useState<OrdersAddRequest>({});
   const [address, setAddress] = useState("请选择地址");
 
   const selectedTwo = (data: AddressList) => {
-    const { provinceName, cityName, countyName, townName, addressDetail } =
-      data;
-
-    if (provinceName) {
-      setAddress(getAddress(data));
-    }
+    setOrdersInfo({
+      ...ordersInfo,
+      addressId: data.id as number,
+    });
+    setAddress(getAddress(data));
   };
+  // 监听订单备注
+  events.on("setOrdersRemark", (remark: string) => {
+    console.log(remark);
+    setOrdersInfo({ remark });
+  });
+  useLoad(() => {
+    if (shopCartList.length <= 0) {
+      Taro.navigateBack();
+    }
+    setExistAddress(buildAddressObjList(addressList) as any);
+    // 填充订单信息
+    setOrdersInfo({
+      orderGoodsAddList: buildOrderGoodsAddList(shopCartList),
+      quantity: calcCartCount(shopCartList),
+      totalPrice: calcCartPrice(shopCartList),
+    });
+  });
+
   return (
     <ConfigProvider className="payPage" theme={customTheme}>
       <CustomBar customTitle="订单结算" color="#fff" showBack={true} />
@@ -75,7 +87,7 @@ export default function Pay() {
           expandIcon={<ArrowDown />}
         >
           <Collapse.Item title="已选商品" name="1">
-            {shopCartList.map((item: any) => {
+            {shopCartList.map((item: CartsVO) => {
               return <SettleCard data={item} />;
             })}
           </Collapse.Item>
@@ -91,7 +103,7 @@ export default function Pay() {
           extra={<ArrowRight />}
         />
       </View>
-      <SettleBar />
+      <SettleBar data={ordersInfo} />
       <Address
         visible={addressVisible}
         type="exist"
