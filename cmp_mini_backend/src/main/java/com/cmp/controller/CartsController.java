@@ -1,6 +1,7 @@
 package com.cmp.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cmp.annotation.AuthCheck;
 import com.cmp.common.BaseResponse;
@@ -15,12 +16,15 @@ import com.cmp.model.dto.carts.CartsEditRequest;
 import com.cmp.model.dto.carts.CartsQueryRequest;
 import com.cmp.model.dto.carts.CartsUpdateRequest;
 import com.cmp.model.entity.Carts;
+import com.cmp.model.entity.Goods;
 import com.cmp.model.entity.User;
 import com.cmp.model.vo.CartsVO;
 import com.cmp.service.CartsService;
+import com.cmp.service.GoodsService;
 import com.cmp.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -43,6 +47,8 @@ public class CartsController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private GoodsService goodsService;
     // region 增删改查
 
     /**
@@ -54,6 +60,7 @@ public class CartsController {
      */
     @PostMapping("/add")
     @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
+    @Transactional
     public BaseResponse<Long> addCarts(@RequestBody CartsAddRequest cartsAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(cartsAddRequest == null, ErrorCode.PARAMS_ERROR);
         Carts carts = new Carts();
@@ -61,15 +68,38 @@ public class CartsController {
         // 数据校验
         cartsService.validCarts(carts, true);
         Long uid = userService.getUid();
+        // 查询是否存在同样商品
+        Carts oldCarts = cartsService.getOne(Wrappers.lambdaQuery(Carts.class)
+                .eq(Carts::getUid, uid)
+                .eq(Carts::getGoodsId, cartsAddRequest.getGoodsId()));
+        if (oldCarts != null){
+            oldCarts.setQuantity(oldCarts.getQuantity() + cartsAddRequest.getQuantity());
+            // 更新购物车信息
+            cartsService.updateById(oldCarts);
+            return ResultUtils.success(oldCarts.getId());
+        }
+        // 不存在，写入数据库
         carts.setUid(uid);
-        // 写入数据库
         boolean result = cartsService.save(carts);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         // 返回新写入的数据 id
         long newCartsId = carts.getId();
         return ResultUtils.success(newCartsId);
     }
-
+    /*
+    * 清空购物车
+    * */
+    @PostMapping("/clear")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
+    public BaseResponse<Boolean> clearCarts() {
+        Long uid = userService.getUid();
+        // 查询数据库
+        QueryWrapper<Carts> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("uid", uid);
+        boolean result = cartsService.remove(queryWrapper);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        return ResultUtils.success(true);
+    }
     /**
      * 删除购物车
      *
@@ -171,7 +201,7 @@ public class CartsController {
         long current = cartsQueryRequest.getCurrent();
         long size = cartsQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        //ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         // 查询数据库
         Page<Carts> cartsPage = cartsService.page(new Page<>(current, size),
                 cartsService.getQueryWrapper(cartsQueryRequest));
@@ -194,7 +224,7 @@ public class CartsController {
         long current = cartsQueryRequest.getCurrent();
         long size = cartsQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        //ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         // 补充查询条件，只查询当前登录用户的数据
         Long uid = userService.getUid();
         QueryWrapper<Carts> wrapper = cartsService
@@ -220,18 +250,22 @@ public class CartsController {
         }
         Carts carts = new Carts();
         BeanUtils.copyProperties(cartsEditRequest, carts);
-        // 数据校验
+        // 1.数据校验
         cartsService.validCarts(carts, false);
-        Long uid = userService.getUid();
-        // 判断是否存在
+        // 2.判断是否存在
         long id = cartsEditRequest.getId();
         Carts oldCarts = cartsService.getById(id);
         ThrowUtils.throwIf(oldCarts == null, ErrorCode.NOT_FOUND_ERROR);
-        // 仅本人或管理员可编辑
+        // 3.查询商品库存
+        Long goodsId = carts.getGoodsId();
+        Goods goods = goodsService.getById(goodsId);
+        ThrowUtils.throwIf(goods.getStock() < carts.getQuantity(), ErrorCode.PARAMS_ERROR, "库存不足");
+        Long uid = userService.getUid();
+        // 4.仅本人或管理员可编辑
         if (!oldCarts.getUid().equals(uid) && !userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
-        // 操作数据库
+        // 5.操作数据库
         boolean result = cartsService.updateById(carts);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);

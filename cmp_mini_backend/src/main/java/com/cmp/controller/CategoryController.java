@@ -164,7 +164,7 @@ public class CategoryController {
         long current = categoryQueryRequest.getCurrent();
         long size = categoryQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        //ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         // 查询数据库
         Page<Category> categoryPage = categoryService.page(new Page<>(current, size),
                 categoryService.getQueryWrapper(categoryQueryRequest));

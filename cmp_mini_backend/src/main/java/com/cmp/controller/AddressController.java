@@ -180,7 +180,7 @@ public class AddressController {
         long current = addressQueryRequest.getCurrent();
         long size = addressQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        //ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         // 查询数据库
         Page<Address> addressPage = addressService.page(new Page<>(current, size),
                 addressService.getQueryWrapper(addressQueryRequest));
@@ -203,7 +203,7 @@ public class AddressController {
         long current = addressQueryRequest.getCurrent();
         long size = addressQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        //ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         // 仅查询自己的地址
         QueryWrapper<Address> wrapper = addressService
                 .getQueryWrapper(addressQueryRequest)

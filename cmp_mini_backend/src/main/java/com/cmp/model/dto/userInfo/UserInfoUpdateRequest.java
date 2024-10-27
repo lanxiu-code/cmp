@@ -20,19 +20,19 @@ public class UserInfoUpdateRequest implements Serializable {
     private Long id;
 
     /**
-     * 标题
+     * 姓名
      */
-    private String title;
+    private String name;
 
     /**
-     * 内容
+     * 电话
      */
-    private String content;
+    private String phone;
 
     /**
-     * 标签列表
+     * 地址
      */
-    private List<String> tags;
+    private String address;
 
     private static final long serialVersionUID = 1L;
 }

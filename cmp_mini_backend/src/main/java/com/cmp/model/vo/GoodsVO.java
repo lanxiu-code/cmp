@@ -42,7 +42,10 @@ public class GoodsVO implements Serializable {
      * 商品描述
      */
     private String description;
-
+    /**
+     * 商品库存
+     */
+    private Integer stock;
     /**
      * 商品图片地址
      */

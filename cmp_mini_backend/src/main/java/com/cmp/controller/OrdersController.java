@@ -61,7 +61,7 @@ public class OrdersController {
     @PostMapping("/add")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     @Transactional
-    public BaseResponse<Long> addOrders(@RequestBody OrdersAddRequest ordersAddRequest, HttpServletRequest request) {
+    public BaseResponse<String> addOrders(@RequestBody OrdersAddRequest ordersAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(ordersAddRequest == null, ErrorCode.PARAMS_ERROR);
         Orders orders = new Orders();
         BeanUtils.copyProperties(ordersAddRequest, orders);
@@ -87,7 +87,7 @@ public class OrdersController {
         }).collect(Collectors.toList());
         boolean orderGoodsRes = orderGoodsService.saveBatch(orderGoodsList);
         ThrowUtils.throwIf(!orderGoodsRes, ErrorCode.OPERATION_ERROR);
-        return ResultUtils.success(newOrdersId);
+        return ResultUtils.success(orderNo);
     }
 
     /**
@@ -188,7 +188,7 @@ public class OrdersController {
                                                                HttpServletRequest request) {
         long size = ordersQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        //ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         // 查询数据库
         Page<Orders> ordersPage = ordersService.page(new Page<>(ordersQueryRequest.getCurrent(), size),
                 ordersService.getQueryWrapper(ordersQueryRequest));
@@ -211,7 +211,7 @@ public class OrdersController {
         long current = ordersQueryRequest.getCurrent();
         long size = ordersQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        //ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Long uid = userService.getUid();
         ThrowUtils.throwIf(uid == null, ErrorCode.SYSTEM_ERROR);
         QueryWrapper<Orders> wrapper = ordersService.getQueryWrapper(ordersQueryRequest).eq("uid", uid);

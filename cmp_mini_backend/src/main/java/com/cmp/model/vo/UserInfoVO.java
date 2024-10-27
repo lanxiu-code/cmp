@@ -1,6 +1,8 @@
 package com.cmp.model.vo;
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.cmp.model.entity.UserInfo;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -22,21 +24,20 @@ public class UserInfoVO implements Serializable {
      * id
      */
     private Long id;
+    /**
+     * 姓名
+     */
+    private String name;
 
     /**
-     * 标题
+     * 电话
      */
-    private String title;
+    private String phone;
 
     /**
-     * 内容
+     * 地址
      */
-    private String content;
-
-    /**
-     * 创建用户 id
-     */
-    private Long userId;
+    private String address;
 
     /**
      * 创建时间
@@ -47,16 +48,6 @@ public class UserInfoVO implements Serializable {
      * 更新时间
      */
     private Date updateTime;
-
-    /**
-     * 标签列表
-     */
-    private List<String> tagList;
-
-    /**
-     * 创建用户信息
-     */
-    private UserVO user;
 
     /**
      * 封装类转对象
@@ -70,8 +61,6 @@ public class UserInfoVO implements Serializable {
         }
         UserInfo userInfo = new UserInfo();
         BeanUtils.copyProperties(userInfoVO, userInfo);
-        List<String> tagList = userInfoVO.getTagList();
-        userInfo.setTags(JSONUtil.toJsonStr(tagList));
         return userInfo;
     }
 
@@ -87,7 +76,6 @@ public class UserInfoVO implements Serializable {
         }
         UserInfoVO userInfoVO = new UserInfoVO();
         BeanUtils.copyProperties(userInfo, userInfoVO);
-        userInfoVO.setTagList(JSONUtil.toList(userInfo.getTags(), String.class));
         return userInfoVO;
     }
 }

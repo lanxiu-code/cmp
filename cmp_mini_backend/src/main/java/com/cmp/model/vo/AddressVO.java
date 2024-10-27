@@ -48,7 +48,14 @@ public class AddressVO implements Serializable {
      * 详细地址
      */
     private String detail;
-
+    /*
+    * 电话
+    * */
+    private String phone;
+    /*
+    * 姓名
+    * */
+    private String name;
     /**
      * 是否默认地址(0-否，1-是)
      */

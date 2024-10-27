@@ -38,12 +38,13 @@ create table if not exists category
 ) comment '商品分类' collate = utf8mb4_unicode_ci;
 
 -- 用户信息表
-create table if not exists userInfo
+create table if not exists user_info
 (
     id           bigint auto_increment comment 'id' primary key,
     uid          bigint                                 not null comment '用户id',
+    name         varchar(128)                           not null comment '姓名',
     phone        varchar(128)                           not null comment '电话',
-    address      varchar(256)                           not null comment '地址',
+    address      varchar(256)  default '未填写'          not null comment '地址',
     createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete     tinyint      default 0                 not null comment '是否删除',

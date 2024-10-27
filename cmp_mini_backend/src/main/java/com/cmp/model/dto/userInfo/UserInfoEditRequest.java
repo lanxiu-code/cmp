@@ -1,5 +1,7 @@
 package com.cmp.model.dto.userInfo;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,26 +15,25 @@ import java.util.List;
  */
 @Data
 public class UserInfoEditRequest implements Serializable {
-
     /**
      * id
      */
     private Long id;
 
     /**
-     * 标题
+     * 姓名
      */
-    private String title;
+    private String name;
 
     /**
-     * 内容
+     * 电话
      */
-    private String content;
+    private String phone;
 
     /**
-     * 标签列表
+     * 地址
      */
-    private List<String> tags;
+    private String address;
 
     private static final long serialVersionUID = 1L;
 }

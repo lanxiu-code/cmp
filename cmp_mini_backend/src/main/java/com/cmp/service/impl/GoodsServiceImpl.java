@@ -93,7 +93,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods>
             return goodsVOPage;
         }
         // 对象列表 => 封装对象列表
-        List<GoodsVO> goodsVOList = goodsList.stream().map(GoodsVO::objToVo).collect(Collectors.toList());
+        List<GoodsVO> goodsVOList = goodsList.stream().map(goods -> {
+            GoodsVO goodsVO = GoodsVO.objToVo(goods);
+            goodsVO.setQuantity(1);
+            return goodsVO;
+        }).collect(Collectors.toList());
         goodsVOPage.setRecords(goodsVOList);
         return goodsVOPage;
     }

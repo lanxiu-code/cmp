@@ -43,7 +43,7 @@ public class CartsServiceImpl extends ServiceImpl<CartsMapper, Carts>
         // 创建数据时，参数不能为空
         if (add) {
             ThrowUtils.throwIf(ObjectUtil.isNull(goodsId), ErrorCode.PARAMS_ERROR);
-            ThrowUtils.throwIf(ObjectUtil.isNull(quantity), ErrorCode.PARAMS_ERROR);
+            ThrowUtils.throwIf(ObjectUtil.isNull(quantity) && quantity >= 1, ErrorCode.PARAMS_ERROR);
         }
     }
 
