@@ -1,4 +1,4 @@
-import { View, Text } from "@tarojs/components";
+import { View } from "@tarojs/components";
 import Taro, { useLoad } from "@tarojs/taro";
 import "./index.scss";
 import {
@@ -6,24 +6,28 @@ import {
   Cell,
   Col,
   ConfigProvider,
-  Image,
+  Button,
   Row,
 } from "@nutui/nutui-react-taro";
 import CustomBar from "@/components/CustomBar/index";
 import customTheme from "./customTheme";
 import { ArrowRight } from "@nutui/icons-react-taro";
+import { useDispatch, useSelector } from "react-redux";
+import { LoginUserVO } from "@/servers";
+import { userLogout } from "@/store/user";
 export default function Account() {
+  const userInfo: LoginUserVO = useSelector(
+    (state: any) => state.user.userInfo
+  );
+  const dispatch = useDispatch();
   return (
     <ConfigProvider className="accountPage" theme={customTheme}>
       <CustomBar />
       <View className="top">
         <Row type="flex" className="avatar" justify="center" align="center">
           <Col span={8} className="align-center col">
-            <Avatar
-              size="large"
-              src="https://img2.baidu.com/it/u=4285632301,4191799154&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1729443600&t=ce8c8635f4ee0a4c42e31874418aed07"
-            />
-            <View>19937693246</View>
+            <Avatar size="large" src={userInfo?.userAvatar} />
+            <View>{userInfo?.name}</View>
           </Col>
         </Row>
       </View>
@@ -39,8 +43,32 @@ export default function Account() {
             title="地址管理"
             extra={<ArrowRight />}
           />
-          <Cell title="个人信息" extra={<ArrowRight />} />
+          <Cell
+            title="个人信息"
+            clickable
+            extra={
+              <ArrowRight
+                onClick={() =>
+                  Taro.navigateTo({
+                    url: "/pages/account/info/index",
+                  })
+                }
+              />
+            }
+          />
         </Cell.Group>
+        <View style={{ margin: "15px" }}>
+          <Button
+            onClick={async () => {
+              await dispatch(userLogout() as any);
+            }}
+            block
+            style={{ height: "40px" }}
+            type="primary"
+          >
+            退出登录
+          </Button>
+        </View>
       </View>
     </ConfigProvider>
   );

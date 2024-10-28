@@ -3,10 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 export type OrdersQueryRequest = {
-  current?: number;
-  id?: number;
-  pageSize?: number;
-  sortField?: string;
-  sortOrder?: string;
-  status?: number | null;
+    current?: number;
+    id?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    status?: number;
 };
+

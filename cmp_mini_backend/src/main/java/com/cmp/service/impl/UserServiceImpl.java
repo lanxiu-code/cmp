@@ -6,6 +6,7 @@ import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cmp.common.ErrorCode;
 import com.cmp.constant.CommonConstant;
@@ -13,14 +14,17 @@ import com.cmp.exception.BusinessException;
 import com.cmp.mapper.UserMapper;
 import com.cmp.model.dto.user.UserQueryRequest;
 import com.cmp.model.entity.User;
+import com.cmp.model.entity.UserInfo;
 import com.cmp.model.enums.UserRoleEnum;
 import com.cmp.model.vo.LoginUserVO;
 import com.cmp.model.vo.UserVO;
+import com.cmp.service.UserInfoService;
 import com.cmp.service.UserService;
 import com.cmp.utils.SqlUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,11 +41,12 @@ import org.springframework.util.DigestUtils;
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
-
+    @Resource
+    private UserInfoService userInfoService;
     /**
      * 盐值，混淆密码
      */
-    public static final String SALT = "yupi";
+    public static final String SALT = "lanxiu";
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -214,8 +219,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user == null) {
             return null;
         }
+        Long uid = user.getId();
+        UserInfo userInfo = userInfoService.getOne(Wrappers
+                .lambdaQuery(UserInfo.class).eq(UserInfo::getUid, uid));
         LoginUserVO loginUserVO = new LoginUserVO();
         BeanUtils.copyProperties(user, loginUserVO);
+        loginUserVO.setName(userInfo.getName());
+        loginUserVO.setPhone(userInfo.getPhone());
         return loginUserVO;
     }
 

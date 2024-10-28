@@ -8,10 +8,10 @@ import {
 import CustomBar from "@/components/CustomBar/index";
 import { Text, View } from "@tarojs/components";
 import { ArrowDown, ArrowRight } from "@nutui/icons-react-taro";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import customTheme from "./customTheme";
 import SettleBar from "@/components/SettleBar/index";
-import Taro, { Events, useLoad } from "@tarojs/taro";
+import Taro, { useLoad } from "@tarojs/taro";
 import SettleCard from "@/components/SettleCard/index";
 import { useState } from "react";
 import { getAddress } from "@/utils/addressUtils";
@@ -19,6 +19,7 @@ import { CartsVO, OrdersAddRequest } from "@/servers";
 import { buildAddressObjList } from "@/adapter/AddressAdapter";
 import { calcCartCount, calcCartPrice } from "@/utils/cartUtil";
 import { buildOrderGoodsAddList } from "@/adapter/OrdersAdapter";
+import PubSub from "pubsub-js";
 interface AddressList {
   id?: string | number;
   provinceName: string;
@@ -32,7 +33,6 @@ interface AddressList {
 }
 export default function Pay() {
   const [addressVisible, setAddressVisible] = useState(false);
-  const events = new Events();
   const shopCartList: [] = useSelector(
     (state: any) => state.shopCart.shopCartList
   );
@@ -48,12 +48,11 @@ export default function Pay() {
       ...ordersInfo,
       addressId: data.id as number,
     });
-    setAddress(getAddress(data));
+    setAddress(getAddress(data as any));
   };
   // 监听订单备注
-  events.on("setOrdersRemark", (remark: string) => {
-    console.log(remark);
-    setOrdersInfo({ remark });
+  PubSub.subscribe("setOrdersRemark", (msg, remark: string) => {
+    setOrdersInfo({ ...ordersInfo, remark });
   });
   useLoad(() => {
     if (shopCartList.length <= 0) {
@@ -95,7 +94,7 @@ export default function Pay() {
         <Cell
           onClick={() => {
             Taro.navigateTo({
-              url: "/pages/shop/remark/index",
+              url: `/pages/shop/remark/index?remark=${ordersInfo?.remark}`,
             });
           }}
           title="备注"

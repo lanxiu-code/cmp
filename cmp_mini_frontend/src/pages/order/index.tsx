@@ -9,16 +9,15 @@ import CustomBar from "@/components/CustomBar/index";
 import { useState } from "react";
 import customTheme from "./customTheme";
 import { useDispatch, useSelector } from "react-redux";
-import { ScrollView } from "@tarojs/components";
 import OrderCard from "@/components/OrderCard/index/index";
 import { useLoad } from "@tarojs/taro";
-import { getOrdersList } from "@/store/order";
+import { getOrdersList, refreshOrdersData } from "@/store/order";
 import { OrdersVO } from "@/servers";
 import withAuth from "@/wrappers/auth";
 import { OrderStatus } from "@/enum/order";
 export default withAuth(() => {
-  const orderList: OrdersVO[] = useSelector(
-    (state: any) => state.order.orderList
+  const ordersMap: [key: string, value: OrdersVO] = useSelector(
+    (state: any) => state.order.ordersMap
   );
   const [pageInfo, setPageInfo] = useState({
     current: 1,
@@ -33,7 +32,7 @@ export default withAuth(() => {
   // 下拉刷新数据
   const loadData = async (status = currentStatus) => {
     const res = await dispatch(
-      getOrdersList(1, pageInfo.pageSize, status) as any
+      refreshOrdersData(1, pageInfo.pageSize, status) as any
     );
     setPageInfo({ ...pageInfo, current: 1 });
     if (pageInfo.current * pageInfo.pageSize >= res.data.total) {
@@ -61,7 +60,7 @@ export default withAuth(() => {
       <Tabs
         value={currentStatus}
         activeType="smile"
-        onChange={(value: string) => {
+        onChange={async (value: string) => {
           setCurrentStatus(value);
           loadData(value);
         }}
@@ -77,32 +76,14 @@ export default withAuth(() => {
             pullingText={<Loading type="circular" />}
             loadMoreText={<>没有更多了</>}
           >
-            {orderList.length ? (
-              orderList.map((item: OrdersVO, index) => {
+            {ordersMap[OrderStatus.ALL]?.length ? (
+              ordersMap[OrderStatus.ALL].map((item: OrdersVO, index) => {
                 return <OrderCard data={item} />;
               })
             ) : (
               <></>
             )}
           </InfiniteLoading>
-          {/* <ScrollView
-            className="scrollview"
-            scrollY
-            scrollWithAnimation
-            enhanced
-            fastDeceleration
-            trapScroll="true"
-            enablePassive
-            onScrollToLower={touchBottom}
-            lowerThreshold={20}
-            pagingEnabled
-            showScrollbar={false}
-            style={{ maxHeight: "79vh" }}
-          >
-            {orderList.map((item: any) => {
-              return <OrderCard data={item} />;
-            })}
-          </ScrollView> */}
         </Tabs.TabPane>
         <Tabs.TabPane title="待完成" value={OrderStatus.WAIT}>
           <InfiniteLoading
@@ -115,8 +96,8 @@ export default withAuth(() => {
             pullingText={<Loading type="circular" />}
             loadMoreText={<>没有更多了</>}
           >
-            {orderList.length ? (
-              orderList.map((item: OrdersVO, index) => {
+            {ordersMap[OrderStatus.WAIT]?.length ? (
+              ordersMap[OrderStatus.WAIT].map((item: OrdersVO, index) => {
                 return <OrderCard data={item} />;
               })
             ) : (
@@ -135,8 +116,8 @@ export default withAuth(() => {
             pullingText={<Loading type="circular" />}
             loadMoreText={<>没有更多了</>}
           >
-            {orderList.length ? (
-              orderList.map((item: OrdersVO, index) => {
+            {ordersMap[OrderStatus.SUCCESS]?.length ? (
+              ordersMap[OrderStatus.SUCCESS].map((item: OrdersVO, index) => {
                 return <OrderCard data={item} />;
               })
             ) : (
@@ -155,8 +136,8 @@ export default withAuth(() => {
             pullingText={<Loading type="circular" />}
             loadMoreText={<>没有更多了</>}
           >
-            {orderList.length ? (
-              orderList.map((item: OrdersVO, index) => {
+            {ordersMap[OrderStatus.CANCEL]?.length ? (
+              ordersMap[OrderStatus.CANCEL].map((item: OrdersVO, index) => {
                 return <OrderCard data={item} />;
               })
             ) : (

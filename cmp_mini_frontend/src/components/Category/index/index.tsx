@@ -16,7 +16,7 @@ import CartBar from "@/components/CartBar/index";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoryVO, GoodsVO } from "@/servers";
 import { getGoodsList } from "@/store/goods";
-import { title } from "@/constants";
+import { TITLE } from "@/constants";
 import { addCartsGoods } from "@/store/shopCart";
 import Taro from "@tarojs/taro";
 export default function Category() {
@@ -30,9 +30,7 @@ export default function Category() {
   const categoryList: CategoryVO[] = useSelector(
     (state: any) => state.category.categoryList
   );
-  const goodsMap: Map<string, GoodsVO[]> = useSelector(
-    (state: any) => state.goods.goodsMap
-  );
+  const goodsMap: Object = useSelector((state: any) => state.goods.goodsMap);
   // 添加到购物车
   const addCarts = async (goods: GoodsVO, isNow: boolean = false) => {
     const newGoods = { ...goods, quantity };
@@ -77,7 +75,7 @@ export default function Category() {
                       title={goods.name}
                       price={goods.price?.toString()}
                       shopDescription={"自营店"}
-                      shopName={title}
+                      shopName={TITLE}
                     />
                   );
                 })}

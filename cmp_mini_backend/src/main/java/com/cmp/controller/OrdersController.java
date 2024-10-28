@@ -15,9 +15,11 @@ import com.cmp.model.dto.orders.OrdersAddRequest;
 import com.cmp.model.dto.orders.OrderGoodsAdd;
 import com.cmp.model.dto.orders.OrdersQueryRequest;
 import com.cmp.model.dto.orders.OrdersUpdateRequest;
+import com.cmp.model.entity.Goods;
 import com.cmp.model.entity.OrderGoods;
 import com.cmp.model.entity.Orders;
 import com.cmp.model.vo.OrdersVO;
+import com.cmp.service.GoodsService;
 import com.cmp.service.OrderGoodsService;
 import com.cmp.service.OrdersService;
 import com.cmp.service.UserService;
@@ -48,6 +50,8 @@ public class OrdersController {
     private OrderGoodsService orderGoodsService;
     @Resource
     private UserService userService;
+    @Resource
+    private GoodsService goodsService;
 
     // region 增删改查
 
@@ -68,8 +72,18 @@ public class OrdersController {
         // 数据校验
         ordersService.validOrders(orders, true);
         List<OrderGoodsAdd> goodsAddList = ordersAddRequest.getOrderGoodsAddList();
-        ThrowUtils.throwIf(goodsAddList == null || goodsAddList.isEmpty(), ErrorCode.PARAMS_ERROR);
-        String orderNo = IdUtil.simpleUUID();
+        // 查询订单是否存在
+        List<Long> goodsIds = goodsAddList.stream()
+                .map(OrderGoodsAdd::getGoodsId)
+                .collect(Collectors.toList());
+        List<Goods> goodsList = goodsService.listByIds(goodsIds);
+        // 数据校验
+        ThrowUtils.throwIf(goodsList.size() != goodsAddList.size(), ErrorCode.PARAMS_ERROR);
+        // 数据校验
+        ThrowUtils.throwIf(goodsAddList.isEmpty(), ErrorCode.PARAMS_ERROR);
+        // todo 对接微信支付
+        // 订单号
+        String orderNo = IdUtil.getSnowflakeNextIdStr();
         Long uid = userService.getUid();
         orders.setUid(uid);
         orders.setOrderNo(orderNo);
@@ -149,7 +163,7 @@ public class OrdersController {
      * @return
      */
     @GetMapping("/get/vo")
-    public BaseResponse<OrdersVO> getOrdersVOById(long id, HttpServletRequest request) {
+    public BaseResponse<OrdersVO> getOrdersVOById(Long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
         // 查询数据库
         Orders orders = ordersService.getById(id);
@@ -214,7 +228,9 @@ public class OrdersController {
         //ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Long uid = userService.getUid();
         ThrowUtils.throwIf(uid == null, ErrorCode.SYSTEM_ERROR);
-        QueryWrapper<Orders> wrapper = ordersService.getQueryWrapper(ordersQueryRequest).eq("uid", uid);
+        QueryWrapper<Orders> wrapper = ordersService
+                .getQueryWrapper(ordersQueryRequest)
+                .eq("uid", uid);
         // 查询数据库
         Page<Orders> ordersPage = ordersService.page(new Page<>(current, size),wrapper);
         // 获取封装类

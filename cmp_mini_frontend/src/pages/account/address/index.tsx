@@ -12,10 +12,13 @@ import {
 } from "@nutui/nutui-react-taro";
 import CustomBar from "@/components/CustomBar/index";
 import { useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getAddress } from "@/utils/addressUtils";
+import { deleteAddress, getAddressList } from "@/store/address";
+import { AddressVO } from "@/servers";
 export default function Address() {
   const addressList = useSelector((state: any) => state.address.addressList);
+  const dispatch = useDispatch();
   const swipeRef = useRef(null);
   const [navVisible, setNavVisible] = useState(false);
   const navList = [
@@ -37,11 +40,14 @@ export default function Address() {
         break;
     }
   };
+  useLoad(async () => {
+    await dispatch(getAddressList() as any);
+  });
   return (
     <ConfigProvider className="addressPage">
       <CustomBar showBack customTitle="收货地址" />
       <Cell.Group>
-        {addressList.map((item: any) => {
+        {addressList.map((item: AddressVO) => {
           return (
             <Swipe
               key={item.id}
@@ -51,7 +57,13 @@ export default function Address() {
                 swipeRef?.current?.close();
               }}
               rightAction={
-                <Button type="primary" shape="square">
+                <Button
+                  onClick={async () =>
+                    await dispatch(deleteAddress(item.id as number) as any)
+                  }
+                  type="primary"
+                  shape="square"
+                >
                   删除
                 </Button>
               }

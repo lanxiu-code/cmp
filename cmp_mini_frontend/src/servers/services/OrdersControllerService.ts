@@ -3,10 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { BaseResponse_boolean_ } from '../models/BaseResponse_boolean_';
-import type { BaseResponse_long_ } from '../models/BaseResponse_long_';
 import type { BaseResponse_OrdersVO_ } from '../models/BaseResponse_OrdersVO_';
 import type { BaseResponse_Page_Orders_ } from '../models/BaseResponse_Page_Orders_';
 import type { BaseResponse_Page_OrdersVO_ } from '../models/BaseResponse_Page_OrdersVO_';
+import type { BaseResponse_string_ } from '../models/BaseResponse_string_';
 import type { DeleteRequest } from '../models/DeleteRequest';
 import type { OrdersAddRequest } from '../models/OrdersAddRequest';
 import type { OrdersQueryRequest } from '../models/OrdersQueryRequest';
@@ -18,13 +18,13 @@ export class OrdersControllerService {
     /**
      * addOrders
      * @param ordersAddRequest ordersAddRequest
-     * @returns BaseResponse_long_ OK
+     * @returns BaseResponse_string_ OK
      * @returns any Created
      * @throws ApiError
      */
     public static addOrdersUsingPost(
         ordersAddRequest: OrdersAddRequest,
-    ): CancelablePromise<BaseResponse_long_ | any> {
+    ): CancelablePromise<BaseResponse_string_ | any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/dev-api/orders/add',

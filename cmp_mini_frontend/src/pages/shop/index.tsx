@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import { getCategoryList } from "@/store/category";
 import { useLoad } from "@tarojs/taro";
 import { getGoodsList } from "@/store/goods";
-import { defaultCategoryId } from "@/constants";
+import { CATEGORY_ID } from "@/constants";
 import { getCartsList } from "@/store/shopCart";
 import { getAddressList } from "@/store/address";
 
@@ -17,7 +17,7 @@ export default withAuth(() => {
   useLoad(async () => {
     await Promise.all([
       dispatch(getCategoryList() as any),
-      dispatch(getGoodsList(defaultCategoryId) as any),
+      dispatch(getGoodsList(CATEGORY_ID) as any),
       dispatch(getCartsList() as any),
       dispatch(getAddressList() as any),
     ]);

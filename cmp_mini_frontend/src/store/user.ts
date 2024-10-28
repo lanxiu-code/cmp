@@ -1,4 +1,8 @@
-import { UserControllerService, UserLoginRequest } from "@/servers";
+import {
+  UserControllerService,
+  UserLoginRequest,
+  UserUpdateMyRequest,
+} from "@/servers";
 import { LoginUserVO } from "./../servers/models/LoginUserVO";
 import { createSlice } from "@reduxjs/toolkit";
 import { ResponseCode } from "@/servers/core/request";
@@ -25,6 +29,17 @@ export const userLogout = () => {
     const res = await UserControllerService.userLogoutUsingPost();
     await dispatch(clearUserInfo());
     Taro.reLaunch({ url: "/pages/user/login/index" });
+    return res;
+  };
+};
+// 修改个人信息
+export const updateMyUser = (data: UserUpdateMyRequest) => {
+  return async (dispatch) => {
+    const res = await UserControllerService.updateMyUserUsingPost(data);
+    if (res.code == ResponseCode.SUCCESS) {
+      await dispatch(getCurrentUser());
+      Taro.showToast({ title: "修改成功", icon: "success" });
+    }
     return res;
   };
 };

@@ -6,7 +6,10 @@ export type AddressAddRequest = {
     cityName?: string;
     countyName?: string;
     detail?: string;
+    id?: number;
     isDefault?: number;
+    name?: string;
+    phone?: string;
     provinceName?: string;
     townName?: string;
 };

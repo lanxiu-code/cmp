@@ -8,6 +8,8 @@ export type AddressUpdateRequest = {
     detail?: string;
     id?: number;
     isDefault?: number;
+    name?: string;
+    phone?: string;
     provinceName?: string;
     townName?: string;
 };

@@ -35,7 +35,7 @@ const App = (props) => {
         url: "/pages/shop/index",
       });
       // Taro.navigateTo({
-      //   url: "/pages/shop/result/index",
+      //   url: "/pages/account/info/index",
       // });
     }
   });

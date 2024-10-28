@@ -91,6 +91,9 @@ export const request = <T>(
     axiosInstance
       .request({
         url,
+        params: {
+          ...options?.query,
+        },
         data: options.body,
         method: options.method,
       })

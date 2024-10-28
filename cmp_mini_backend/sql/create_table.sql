@@ -121,6 +121,8 @@ create table if not exists address
 (
     id           bigint auto_increment comment 'id' primary key,
     uid          bigint                                 not null comment '用户id',
+    name         varchar(128)                           not null comment '收货人姓名',
+    phone        varchar(128)                            not null comment '收货人电话',
     provinceName varchar(128)                           not null comment '省份名称',
     countyName   varchar(128)                           not null comment '城市名称',
     cityName     varchar(128)                           not null comment '县名称',

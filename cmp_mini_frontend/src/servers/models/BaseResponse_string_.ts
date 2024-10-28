@@ -2,10 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type UserUpdateMyRequest = {
-    name?: string;
-    phone?: string;
-    userAvatar?: string;
-    userName?: string;
+export type BaseResponse_string_ = {
+    code?: number;
+    data?: string;
+    message?: string;
 };
 

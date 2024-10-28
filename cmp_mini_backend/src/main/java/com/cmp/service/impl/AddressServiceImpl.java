@@ -77,14 +77,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address>
     @Override
     public AddressVO getAddressVO(Address address, HttpServletRequest request) {
         // 对象转封装类
-        AddressVO addressVO = AddressVO.objToVo(address);
-        // 获取用户信息
-        Long uid = address.getUid();
-        UserInfo userInfo = userInfoService.getOne(Wrappers.lambdaQuery(UserInfo.class)
-                .eq(UserInfo::getUid, uid));
-        addressVO.setName(userInfo.getName());
-        addressVO.setPhone(userInfo.getPhone());
-        return addressVO;
+        return AddressVO.objToVo(address);
     }
 
     @Override

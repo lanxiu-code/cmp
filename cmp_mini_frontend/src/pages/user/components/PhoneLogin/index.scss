@@ -1,12 +1,4 @@
-.loginPage{
-    .title{
-        display: block;
-        font-size: 60px;
-        text-align: center;
-        font-weight: 600;
-        color:  rgb(16, 137, 211);
-        font-family:'华文琥珀'
-    }
+.phoneLogin{
     .login-input{
         background: #efefef;
         height: 80px;
@@ -16,5 +8,9 @@
     .login-btn{
         height: 80px;
         background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+    }
+    .captcha{
+        padding:0 35px 0 0;
+        box-sizing: border-box;
     }
 }

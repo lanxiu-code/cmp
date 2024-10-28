@@ -2,7 +2,7 @@ import { View, Text } from "@tarojs/components";
 import Taro, { useLoad } from "@tarojs/taro";
 import "./index.scss";
 import { NavBar } from "@nutui/nutui-react-taro";
-import { title } from "@/constants";
+import { TITLE } from "@/constants";
 import { getTitleBarHeight, getTopSafeArea } from "@/utils/systemInfo";
 import { ArrowLeft } from "@nutui/icons-react-taro";
 interface Props {
@@ -30,7 +30,7 @@ export default function CustomBar(props: Props) {
             color: props?.color ?? "#000",
           }}
         >
-          {props?.customTitle ? props.customTitle : title}
+          {props?.customTitle ? props.customTitle : TITLE}
         </Text>
       </NavBar>
       {/* <Row

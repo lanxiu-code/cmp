@@ -1,12 +1,12 @@
 import { GoodsControllerService } from "@/servers";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { current, pageSize } from "@/constants";
+import { CURRENT, PAGE_SIZE } from "@/constants";
 export const getGoodsList = (categoryId) => {
   return async (dispatch) => {
     const res = await GoodsControllerService.listGoodsVoByPageUsingPost({
       categoryId,
-      current,
-      pageSize,
+      current: CURRENT,
+      pageSize: PAGE_SIZE,
     });
     // dispatch(setGoodsList(res?.data?.records));
     dispatch(

@@ -8,10 +8,18 @@ import {
 } from "@nutui/nutui-react-taro";
 import { useState } from "react";
 import { View } from "@tarojs/components";
-import Taro, { Events } from "@tarojs/taro";
+import Taro, { useLoad } from "@tarojs/taro";
+import PubSub from "pubsub-js";
+interface Params {
+  remark?: string;
+}
 export default function Remark() {
-  const [content, setContent] = useState<string>("");
-  const events = new Events();
+  const [content, setContent] = useState("");
+  useLoad((params: Params) => {
+    if (params.remark != undefined && params.remark != "undefined") {
+      setContent(params?.remark as string);
+    }
+  });
   return (
     <ConfigProvider className="remark">
       <CustomBar customTitle="订单备注" showBack={true} />
@@ -31,7 +39,7 @@ export default function Remark() {
           />
           <Button
             onClick={() => {
-              events.trigger("setOrdersRemark", content);
+              PubSub.publish("setOrdersRemark", content);
               Taro.navigateBack();
             }}
             size="xlarge"

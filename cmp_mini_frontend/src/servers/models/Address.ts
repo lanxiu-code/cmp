@@ -10,6 +10,8 @@ export type Address = {
     id?: number;
     isDefault?: number;
     isDelete?: number;
+    name?: string;
+    phone?: string;
     provinceName?: string;
     townName?: string;
     uid?: number;

@@ -22,7 +22,15 @@ public class AddressUpdateRequest implements Serializable {
      */
     private Long id;
 
+    /**
+     * 收货人姓名
+     */
+    private String name;
 
+    /**
+     * 收货人电话
+     */
+    private String phone;
     /**
      * 省份名称
      */

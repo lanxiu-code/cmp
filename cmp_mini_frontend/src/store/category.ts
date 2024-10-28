@@ -1,11 +1,11 @@
 import { CategoryControllerService } from "@/servers";
 import { createSlice } from "@reduxjs/toolkit";
-import { current, pageSize } from "@/constants";
+import { CURRENT, PAGE_SIZE } from "@/constants";
 export const getCategoryList = () => {
   return async (dispatch) => {
     const res = await CategoryControllerService.listCategoryVoByPageUsingPost({
-      current,
-      pageSize,
+      current: CURRENT,
+      pageSize: PAGE_SIZE,
     });
     dispatch(setCategoryList(res?.data?.records));
     return res;
