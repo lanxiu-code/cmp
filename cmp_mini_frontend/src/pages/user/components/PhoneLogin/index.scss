@@ -1,0 +1,16 @@
+.phoneLogin{
+    .login-input{
+        background: #efefef;
+        height: 80px;
+        border-radius: 50px;
+        padding-left: 16px;
+    }
+    .login-btn{
+        height: 80px;
+        background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+    }
+    .captcha{
+        padding:0 35px 0 0;
+        box-sizing: border-box;
+    }
+}

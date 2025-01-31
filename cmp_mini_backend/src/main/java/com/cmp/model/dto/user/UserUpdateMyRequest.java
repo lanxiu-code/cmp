@@ -16,16 +16,19 @@ public class UserUpdateMyRequest implements Serializable {
      * 用户昵称
      */
     private String userName;
-
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 电话
+     */
+    private String phone;
     /**
      * 用户头像
      */
     private String userAvatar;
 
-    /**
-     * 简介
-     */
-    private String userProfile;
 
     private static final long serialVersionUID = 1L;
 }

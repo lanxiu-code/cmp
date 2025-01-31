@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmp.mapper.AddressMapper">
+
+    <resultMap id="BaseResultMap" type="com.cmp.model.entity.Address">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="uid" column="uid" jdbcType="BIGINT"/>
+            <result property="provinceName" column="provinceName" jdbcType="VARCHAR"/>
+            <result property="countyName" column="countyName" jdbcType="VARCHAR"/>
+            <result property="cityName" column="cityName" jdbcType="VARCHAR"/>
+            <result property="townName" column="townName" jdbcType="VARCHAR"/>
+            <result property="detail" column="detail" jdbcType="VARCHAR"/>
+            <result property="isDefault" column="isDefault" jdbcType="TINYINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,uid,provinceName,
+        countyName,cityName,townName,
+        detail,isDefault,createTime,
+        updateTime,isDelete
+    </sql>
+</mapper>

@@ -1,0 +1,33 @@
+package com.cmp.model.dto.orders;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.cmp.common.PageRequest;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * 查询订单请求
+ *
+ * cmp
+ *
+ */
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class OrdersQueryRequest extends PageRequest implements Serializable {
+    /**
+     * id
+     */
+    private Long id;
+
+    /**
+     * 订单状态(0-待完成,1-已完成，2-已取消)
+     */
+    private Integer status;
+
+    private static final long serialVersionUID = 1L;
+}

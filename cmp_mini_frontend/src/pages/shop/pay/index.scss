@@ -1,0 +1,29 @@
+.payPage{
+    position: relative;
+    .background{
+        position: absolute;
+        top: 0;
+        z-index: -1;
+        width: 100%;
+        height: 400px;
+        background: linear-gradient(180deg, #FC3F41 0%, #F98C8D 50%,#F5EEEE 90%,#F5F5F5 100%);
+    }
+    .card{
+        height: 100px;
+        margin: 0 auto;
+        width: 90%;
+    }
+    .cardGroup{
+        // width: 90%;
+        // margin: 0 auto;
+        // padding: 5px;
+        // box-sizing: border-box;        
+    }
+    .content{  
+        height: 83vh;
+        box-sizing: border-box;        
+        padding: 20px;     
+        background: #F5F5F5;
+
+    }
+}

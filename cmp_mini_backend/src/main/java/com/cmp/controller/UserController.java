@@ -1,5 +1,9 @@
 package com.cmp.controller;
 
+import cn.hutool.captcha.CaptchaUtil;
+import cn.hutool.captcha.GifCaptcha;
+import cn.hutool.captcha.LineCaptcha;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cmp.annotation.AuthCheck;
 import com.cmp.common.BaseResponse;
@@ -16,8 +20,11 @@ import com.cmp.model.dto.user.UserRegisterRequest;
 import com.cmp.model.dto.user.UserUpdateMyRequest;
 import com.cmp.model.dto.user.UserUpdateRequest;
 import com.cmp.model.entity.User;
+import com.cmp.model.entity.UserInfo;
+import com.cmp.model.vo.LoginInfo;
 import com.cmp.model.vo.LoginUserVO;
 import com.cmp.model.vo.UserVO;
+import com.cmp.service.UserInfoService;
 import com.cmp.service.UserService;
 
 import java.util.List;
@@ -25,6 +32,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.cmp.utils.NetUtils;
+import com.cmp.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -51,9 +60,35 @@ public class UserController {
 
     @Resource
     private UserService userService;
-
-
+    @Resource
+    private UserInfoService userInfoService;
+    @Resource
+    private RedisUtils redisUtils;
+    private static GifCaptcha gifCaptcha = null;
+    static {
+        gifCaptcha = new GifCaptcha(80,40);
+    }
     // region 登录相关
+    /*
+    * 登录验证码
+    * */
+    @GetMapping("/captcha")
+    public void captcha(HttpServletRequest request,HttpServletResponse response) {
+        gifCaptcha.createCode();
+        String code = gifCaptcha.getCode();
+        log.info("验证码：" + code);
+        // 存储验证码
+        String ipAddress = NetUtils.getIpAddress(request);
+        redisUtils.set(ipAddress,code,60L);
+        try{
+            // 写入到response返回图片
+            response.setContentType("image/png");
+            gifCaptcha.write(response.getOutputStream());
+            response.getOutputStream().flush();
+        }catch (Exception e){
+            log.info(e.getMessage());
+        }
+    }
 
     /**
      * 用户注册
@@ -84,17 +119,28 @@ public class UserController {
      * @return
      */
     @PostMapping("/login")
-    public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public BaseResponse<LoginInfo> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         if (userLoginRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         String userAccount = userLoginRequest.getUserAccount();
         String userPassword = userLoginRequest.getUserPassword();
+        String captcha = userLoginRequest.getCaptcha();
+        // 从redis中获取验证码
+        String ipAddress = NetUtils.getIpAddress(request);
+        String oldCode = redisUtils.get(ipAddress);
+        ThrowUtils.throwIf(oldCode==null,ErrorCode.OPERATION_ERROR,"验证码已过期");
+        ThrowUtils.throwIf(!StringUtils.equals(captcha,oldCode), ErrorCode.OPERATION_ERROR,"验证码错误");
+        // 删除验证码
+        redisUtils.del(ipAddress);
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
-        return ResultUtils.success(loginUserVO);
+        String token = userService.userLogin(userAccount, userPassword, request);
+        LoginInfo loginInfo = LoginInfo.builder()
+                .token(token)
+                .build();
+        return ResultUtils.success(loginInfo);
     }
 
 
@@ -257,7 +303,7 @@ public class UserController {
         long current = userQueryRequest.getCurrent();
         long size = userQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        //ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Page<User> userPage = userService.page(new Page<>(current, size),
                 userService.getQueryWrapper(userQueryRequest));
         Page<UserVO> userVOPage = new Page<>(current, size, userPage.getTotal());
@@ -283,10 +329,14 @@ public class UserController {
         }
         User loginUser = userService.getLoginUser(request);
         User user = new User();
+        UserInfo userInfo = new UserInfo();
         BeanUtils.copyProperties(userUpdateMyRequest, user);
+        BeanUtils.copyProperties(userUpdateMyRequest, userInfo);
         user.setId(loginUser.getId());
         boolean result = userService.updateById(user);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        boolean update = userInfoService.update(userInfo, Wrappers.lambdaUpdate(UserInfo.class)
+                .eq(UserInfo::getUid, loginUser.getId()));
+        ThrowUtils.throwIf(!(result && update), ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
 }

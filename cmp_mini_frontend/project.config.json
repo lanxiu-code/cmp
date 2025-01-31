@@ -1,9 +1,15 @@
 {
-	"setting": {
-		"packNpmManually": true,
-		"packNpmRelationList": [{
-			"packageJsonPath": "./package.json",
-			"miniprogramNpmDistDir": "./dist/dev/mp-weixin"
-		}]
-	}
+  "miniprogramRoot": "./dist",
+  "projectname": "cmp_mini_frontend",
+  "description": "在线点单小程序",
+  "appid": "wx27dd115ce4467d45",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "enhance": false,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram"
 }

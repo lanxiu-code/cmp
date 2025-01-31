@@ -1,0 +1,51 @@
+{
+  "id": "4712993",
+  "name": "餐饮小程序",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "3181960",
+      "name": "支付成功",
+      "font_class": "zhifuchenggong",
+      "unicode": "e651",
+      "unicode_decimal": 58961
+    },
+    {
+      "icon_id": "10202010",
+      "name": "购物袋",
+      "font_class": "gouwudai",
+      "unicode": "e8e2",
+      "unicode_decimal": 59618
+    },
+    {
+      "icon_id": "3759002",
+      "name": "订单",
+      "font_class": "dingdan",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "4770011",
+      "name": "购物",
+      "font_class": "gouwu",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "14444798",
+      "name": "首页",
+      "font_class": "shouye",
+      "unicode": "e714",
+      "unicode_decimal": 59156
+    },
+    {
+      "icon_id": "22759023",
+      "name": "我的",
+      "font_class": "wode",
+      "unicode": "f7f6",
+      "unicode_decimal": 63478
+    }
+  ]
+}

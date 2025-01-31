@@ -3,6 +3,8 @@
 # 
 server:
   port: 8101
+  servlet:
+    context-path: /dev-api
 spring:
   # 数据库配置
   # todo 需替换配置
@@ -11,3 +13,10 @@ spring:
     url: jdbc:mysql://localhost:3306/cmp
     username: root
     password: root
+  # redis 配置
+  redis:
+    database: 1
+    host: 0.0.0.0
+    port: 6379
+    timeout: 5000
+

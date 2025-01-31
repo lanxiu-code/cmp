@@ -14,7 +14,7 @@ create table if not exists user
     id           bigint auto_increment comment 'id' primary key,
     userAccount  varchar(256)                           not null comment '账号',
     userPassword varchar(512)                           not null comment '密码',
-    userGender       tinyint                                null comment '性别（1-男, 0-女）',
+    userGender   tinyint      default 0                 null comment '性别（1-男, 0-女）',
     unionId      varchar(256)                           null comment '微信开放平台id',
     mpOpenId     varchar(256)                           null comment '公众号openId',
     userName     varchar(256)                           null comment '用户昵称',
@@ -27,42 +27,150 @@ create table if not exists user
     index idx_unionId (unionId)
 ) comment '用户' collate = utf8mb4_unicode_ci;
 
--- 帖子表
-create table if not exists post
+-- 商品分类表
+create table if not exists category
 (
-    id         bigint auto_increment comment 'id' primary key,
-    title      varchar(512)                       null comment '标题',
-    content    text                               null comment '内容',
-    tags       varchar(1024)                      null comment '标签列表（json 数组）',
-    thumbNum   int      default 0                 not null comment '点赞数',
-    favourNum  int      default 0                 not null comment '收藏数',
-    userId     bigint                             not null comment '创建用户 id',
-    createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
-    updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    isDelete   tinyint  default 0                 not null comment '是否删除',
-    index idx_userId (userId)
-) comment '帖子' collate = utf8mb4_unicode_ci;
+    id           bigint auto_increment comment 'id' primary key,
+    name         varchar(128)                           not null comment '分类名称',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除'
+) comment '商品分类' collate = utf8mb4_unicode_ci;
 
--- 帖子点赞表（硬删除）
-create table if not exists post_thumb
+-- 用户信息表
+create table if not exists user_info
 (
-    id         bigint auto_increment comment 'id' primary key,
-    postId     bigint                             not null comment '帖子 id',
-    userId     bigint                             not null comment '创建用户 id',
-    createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
-    updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    index idx_postId (postId),
-    index idx_userId (userId)
-) comment '帖子点赞';
+    id           bigint auto_increment comment 'id' primary key,
+    uid          bigint                                 not null comment '用户id',
+    name         varchar(128)                           not null comment '姓名',
+    phone        varchar(128)                           not null comment '电话',
+    address      varchar(256)  default '未填写'          not null comment '地址',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除',
+    index idx_uid (uid)
+) comment '用户信息' collate = utf8mb4_unicode_ci;
 
--- 帖子收藏表（硬删除）
-create table if not exists post_favour
+-- 商品表
+create table if not exists goods
 (
-    id         bigint auto_increment comment 'id' primary key,
-    postId     bigint                             not null comment '帖子 id',
-    userId     bigint                             not null comment '创建用户 id',
-    createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
-    updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    index idx_postId (postId),
-    index idx_userId (userId)
-) comment '帖子收藏';
+    id           bigint auto_increment comment 'id' primary key,
+    name         varchar(128)                           not null comment '商品名称',
+    categoryId   bigint                                 not null comment '商品分类id',
+    supplierId   bigint                                 not null comment '供应商id',
+    price        decimal(10, 2)                         not null comment '商品价格',
+    stock        int                                    not null comment '商品库存',
+    description  varchar(1024)                          null comment '商品描述',
+    image        varchar(1024)                          null comment '商品图片地址',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除',
+    index idx_categoryId (categoryId),
+    index idx_supplierId (supplierId)
+) comment '商品' collate = utf8mb4_unicode_ci;
+
+-- 订单表
+create table if not exists orders
+(
+    id           bigint auto_increment comment 'id' primary key,
+    orderNo      varchar(128)                           not null comment '订单编号',
+    uid          bigint                                  not null comment '用户id',
+    addressId    bigint                                 not null comment '收货地址id',
+    quantity     int                                    not null comment '商品数量',
+    totalPrice   decimal(10, 2)                         not null comment '订单总金额',
+    remark       varchar(256)                           null comment '订单备注',
+    status        int     default 0                     not null comment '订单状态(0-待完成,1-已完成，2-已取消)',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除',
+    index idx_uid (uid),
+    index idx_orderNo (orderNo),
+    index idx_addressId (addressId)
+) comment '订单' collate = utf8mb4_unicode_ci;
+
+-- 订单商品表
+create table if not exists order_goods
+(
+    id           bigint auto_increment comment 'id' primary key,
+    orderId     bigint                                 not null comment '订单id',
+    goodsId     bigint                                 not null comment '商品id',
+    quantity     int                                    not null comment '商品数量',
+    price        decimal(10, 2)                         not null comment '商品价格',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除',
+    foreign key (orderId) references orders (id),
+    foreign key (goodsId) references goods (id)
+) comment '订单商品' collate = utf8mb4_unicode_ci;
+
+-- 供应商表
+create table if not exists supplier
+(
+    id           bigint auto_increment comment 'id' primary key,
+    name         varchar(128)                           not null comment '供应商名称',
+    contact      varchar(128)                           not null comment '供应商联系人',
+    phone        varchar(128)                           not null comment '供应商电话',
+    address      varchar(256)                           not null comment '供应商地址',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除'
+) comment '订单' collate = utf8mb4_unicode_ci;
+
+-- 地址表
+create table if not exists address
+(
+    id           bigint auto_increment comment 'id' primary key,
+    uid          bigint                                 not null comment '用户id',
+    name         varchar(128)                           not null comment '收货人姓名',
+    phone        varchar(128)                            not null comment '收货人电话',
+    provinceName varchar(128)                           not null comment '省份名称',
+    countyName   varchar(128)                           not null comment '城市名称',
+    cityName     varchar(128)                           not null comment '县名称',
+    townName    varchar(128)                           not null comment '乡镇名称',
+    detail       varchar(256)                           not null comment '详细地址',
+    isDefault   tinyint(1)                             not null comment '是否默认地址(0-否，1-是)',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除',
+    index idx_uid (uid)
+) comment '地址' collate = utf8mb4_unicode_ci;
+
+-- 购物车表
+create table if not exists carts
+(
+    id           bigint auto_increment comment 'id' primary key,
+    uid          bigint                                 not null comment '用户id',
+    goodsId     bigint                                 not null comment '商品id',
+    quantity     int                                    not null comment '商品数量',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除',
+    index idx_uid (uid),
+    index idx_goodsId (goodsId)
+) comment '购物车' collate = utf8mb4_unicode_ci;
+
+
+
+##### 待办
+-- 支付表
+create table if not exists payment
+(
+    id           bigint auto_increment comment 'id' primary key,
+    orderId      bigint                                 not null comment '订单id',
+    amount       decimal(10, 2)                         not null comment '支付金额',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除'
+) comment '支付' collate = utf8mb4_unicode_ci;
+
+-- 退款表
+create table if not exists refund
+(
+    id           bigint auto_increment comment 'id' primary key,
+    orderId      bigint                                 not null comment '订单id',
+    amount       decimal(10, 2)                         not null comment '退款金额',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除'
+) comment '退款' collate = utf8mb4_unicode_ci;
+
